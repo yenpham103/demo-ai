@@ -1,10 +1,10 @@
 import { Router } from 'express';
 import lifeCheckRoutes from './life.route';
-import crispRoutes from './crisp.route';
+import WebhookRouter from './webhook.routes';
 
 const router = Router();
 
-router.use('/crisp', crispRoutes);    
+router.use('/webhook', WebhookRouter);    
 router.use('/life-check', lifeCheckRoutes);    
 
 export default router;

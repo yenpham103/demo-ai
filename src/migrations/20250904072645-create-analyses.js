@@ -18,11 +18,11 @@ module.exports = {
         allowNull: false,
       },
       customer_needs: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: false,
       },
       pain_points: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: false,
       },
       customer_mood: {
@@ -34,11 +34,11 @@ module.exports = {
         allowNull: false,
       },
       conversation_summary: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: false,
       },
       main_topic: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: false,
       },
       resolution_status: {
@@ -46,15 +46,15 @@ module.exports = {
         allowNull: false,
       },
       mentioned_products: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: false,
       },
       technical_issues: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: false,
       },
       feature_requests: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: false,
       },
       openai_response: {
@@ -62,12 +62,14 @@ module.exports = {
         allowNull: false,
       },
       summary_embedding: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: false,
       },
       createdAt: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
       updatedAt: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
     });
+
+    await queryInterface.addIndex('analyses', ['session_id']);
   },
 
   down: async (queryInterface) => {

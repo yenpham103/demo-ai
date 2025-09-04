@@ -11,30 +11,32 @@ module.exports = {
       session_id: {
         type: DataTypes.STRING,
         allowNull: false,
+        unique: true,
       },
       customer_nickname: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       customer_user_id: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       customer_email: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       agent_nickname: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       agent_user_id: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       is_resolved: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
+        defaultValue: false,
       },
       resolved_at: {
         type: DataTypes.DATE,
@@ -43,21 +45,24 @@ module.exports = {
       messages: {
         type: DataTypes.JSON,
         allowNull: false,
+        defaultValue: '[]',
       },
       conversation_text: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: false,
+        defaultValue: '',
       },
       last_message_content: {
-        type: DataTypes.STRING,
-        allowNull: false,
+        type: DataTypes.TEXT,
+        allowNull: true,
       },
       ai_analyzed: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
+        defaultValue: false,
       },
       ai_summary: {
-        type: DataTypes.STRING,
+        type: DataTypes.TEXT,
         allowNull: true,
       },
       category: {
@@ -87,6 +92,11 @@ module.exports = {
       createdAt: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
       updatedAt: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
     });
+
+    await queryInterface.addIndex('sessions', ['session_id']);
+    await queryInterface.addIndex('sessions', ['customer_user_id']);
+    await queryInterface.addIndex('sessions', ['ai_analyzed']);
+    await queryInterface.addIndex('sessions', ['first_message_at', 'last_message_at']);
   },
 
   down: async (queryInterface) => {

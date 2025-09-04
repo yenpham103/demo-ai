@@ -6,7 +6,9 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsx watch src/index.ts",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "analyze:batch": "tsx src/scripts/batch-analysis.ts",
+    "analyze:session": "tsx src/scripts/analyze-session.ts" 
   },
   "repository": {
     "type": "git",
@@ -34,7 +36,6 @@
     "amqplib": "^0.10.3",
     "openai": "^4.24.7",
     "node-cron": "^3.0.3",
-    "umzug": "^3.8.2",
     "axios": "^1.9.0"
   },
   "devDependencies": {

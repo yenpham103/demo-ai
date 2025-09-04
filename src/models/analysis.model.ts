@@ -9,19 +9,18 @@ interface AnalysisAttributes {
   customer_mood: string;
   satisfaction_level: number;
   conversation_summary: string;
-  main_topics: string;
+  main_topic: string;
   resolution_status: string;
-  analyzed_at: Date;
   mentioned_products: string;
   technical_issues: string;
   feature_requests: string;
-  openai_response: JSON;
+  openai_response: any;
   summary_embedding: string;
   createdAt?: Date;
   updatedAt?: Date;
 }
 
-export type AnalysisCreationAttributes = Optional<AnalysisAttributes, 'id'>;
+export type AnalysisCreationAttributes = Optional<AnalysisAttributes, 'id' | 'createdAt' | 'updatedAt'>;
 
 export class Analysis extends Model<AnalysisAttributes, AnalysisCreationAttributes> implements AnalysisAttributes {
   public id!: number;
@@ -32,93 +31,95 @@ export class Analysis extends Model<AnalysisAttributes, AnalysisCreationAttribut
   public customer_mood!: string;
   public satisfaction_level!: number;
   public conversation_summary!: string;
-  public main_topics!: string;
+  public main_topic!: string;
   public resolution_status!: string;
-  public analyzed_at!: Date;
   public mentioned_products!: string;
   public technical_issues!: string;
   public feature_requests!: string;
-  public openai_response!: JSON;
+  public openai_response!: any;
   public summary_embedding!: string;
-
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 
-  static initModel(sequelize: Sequelize): typeof Analysis {
-    Analysis.init(
-      {
-        id: {
-          type: DataTypes.INTEGER.UNSIGNED,
-          autoIncrement: true,
-          primaryKey: true,
-        },
-        session_id: {
-          type: DataTypes.STRING,
-          allowNull: false,
-          unique: true,
-        },
-        openai_model: {
-          type: DataTypes.STRING,
-          allowNull: false,
-        },
-        customer_needs: {
-          type: DataTypes.STRING,
-          allowNull: false,
-        },
-        pain_points: {
-          type: DataTypes.STRING,
-          allowNull: false,
-        },
-        customer_mood: {
-          type: DataTypes.STRING,
-          allowNull: false,
-        },
-        satisfaction_level: {
-          type: DataTypes.INTEGER,
-          allowNull: false,
-        },
-        conversation_summary: {
-          type: DataTypes.STRING,
-          allowNull: false,
-        },
-        main_topics: {
-          type: DataTypes.STRING,
-          allowNull: false,
-        },
-        resolution_status: {
-          type: DataTypes.STRING,
-          allowNull: false,
-        },
-        analyzed_at: {
-          type: DataTypes.DATE,
-          allowNull: false,
-        },
-        mentioned_products: {
-          type: DataTypes.STRING,
-          allowNull: false,
-        },
-        technical_issues: {
-          type: DataTypes.STRING,
-          allowNull: false,
-        },
-        feature_requests: {
-          type: DataTypes.STRING,
-          allowNull: false,
-        },
-        openai_response: {
-          type: DataTypes.JSON,
-          allowNull: false,
-        },
-        summary_embedding: {
-          type: DataTypes.STRING,
-          allowNull: false,
-        }
+  public static initModel(sequelize: Sequelize): typeof Analysis {
+    Analysis.init({
+      id: {
+        type: DataTypes.INTEGER.UNSIGNED,
+        autoIncrement: true,
+        primaryKey: true
       },
-      {
-        sequelize,
-        tableName: 'analyses',
+      session_id: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        unique: true
+      },
+      openai_model: {
+        type: DataTypes.STRING,
+        allowNull: false
+      },
+      customer_needs: {
+        type: DataTypes.TEXT,
+        allowNull: false
+      },
+      pain_points: {
+        type: DataTypes.TEXT,
+        allowNull: false
+      },
+      customer_mood: {
+        type: DataTypes.STRING,
+        allowNull: false
+      },
+      satisfaction_level: {
+        type: DataTypes.INTEGER,
+        allowNull: false
+      },
+      conversation_summary: {
+        type: DataTypes.TEXT,
+        allowNull: false
+      },
+      main_topic: {
+        type: DataTypes.TEXT,
+        allowNull: false
+      },
+      resolution_status: {
+        type: DataTypes.STRING,
+        allowNull: false
+      },
+      mentioned_products: {
+        type: DataTypes.TEXT,
+        allowNull: false
+      },
+      technical_issues: {
+        type: DataTypes.TEXT,
+        allowNull: false
+      },
+      feature_requests: {
+        type: DataTypes.TEXT,
+        allowNull: false
+      },
+      openai_response: {
+        type: DataTypes.JSON,
+        allowNull: false
+      },
+      summary_embedding: {
+        type: DataTypes.TEXT,
+        allowNull: false
+      },
+      createdAt: {
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW
+      },
+      updatedAt: {
+        type: DataTypes.DATE,
+        defaultValue: DataTypes.NOW
       }
-    );
+    }, {
+      sequelize,
+      modelName: 'Analysis',
+      tableName: 'analyses',
+      timestamps: true
+    });
+
     return Analysis;
   }
 }
