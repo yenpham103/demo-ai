@@ -21,23 +21,23 @@ const config: ConfigGroup = {
   development: {
     username: process.env.DB_USERNAME || 'root',
     password: process.env.DB_PASSWORD || null,
-    database: process.env.DB_NAME || 'ai_service',
+    database: process.env.DB_NAME || 'tb_customers_ai',
     host: process.env.DB_HOST || '127.0.0.1',
-    dialect: 'mysql',
+    dialect: 'postgres',
   },
   test: {
     username: process.env.DB_USERNAME || 'root',
     password: process.env.DB_PASSWORD || null,
-    database: process.env.DB_NAME || 'ai_service',
+    database: process.env.DB_NAME || 'tb_customers_ai',
     host: process.env.DB_HOST || '127.0.0.1',
-    dialect: 'mysql',
+    dialect: 'postgres',
   },
   production: {
     username: process.env.DB_USERNAME || 'root',
     password: process.env.DB_PASSWORD || null,
-    database: process.env.DB_NAME || 'ai_service',
+    database: process.env.DB_NAME || 'tb_customers_ai',
     host: process.env.DB_HOST || '127.0.0.1',
-    dialect: 'mysql',
+    dialect: 'postgres',
   },
 };
 

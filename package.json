@@ -6,10 +6,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsx watch src/index.ts",
-    "start": "node dist/index.js",
-    "db:migrate": "npx sequelize-cli db:migrate",
-    "db:seed": "npx sequelize-cli db:seed:all",
-    "db:create": "npx sequelize-cli db:create"
+    "start": "node dist/index.js"
   },
   "repository": {
     "type": "git",
