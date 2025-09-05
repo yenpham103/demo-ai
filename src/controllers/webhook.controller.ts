@@ -3,7 +3,7 @@ import { processMessage } from '../utils/conversation.utils';
 import { CRISP_TOPIC } from '../constants/rabbitmq.constant';
 
 export class WebhookController {
-    static async handleCrispWebhook(req: Request, res: Response): Promise<void> {
+    static async crispWebhook(req: Request, res: Response): Promise<void> {
         try {
             const { event, data } = req.body;
 

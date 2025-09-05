@@ -1,59 +1,67 @@
 export const mapMoodToSentiment = (mood: string): number => {
     const moodMap: Record<string, number> = {
-        'happy': 5,
-        'satisfied': 4,
-        'neutral': 3,
-        'confused': 2,
-        'frustrated': 2,
-        'angry': 1
+        'angry': -1,
+        'frustrated': -0.7,
+        'confused': -0.3,
+        'neutral': 0,
+        'satisfied': 0.7,
+        'happy': 1
     };
-    
-    return moodMap[mood.toLowerCase()] || 3;
+
+    return moodMap[mood.toLowerCase()] || 0;
 };
 
-export const calculateUrgencyScore = (conversation: string, satisfactionLevel: number): number => {
-    let urgencyScore = 5 - satisfactionLevel;
-    
+export const calculateUrgencyScore = (conversationText: string, satisfactionLevel: number): number => {
+    let urgencyScore = 3;
+
+    if (satisfactionLevel >= 4) {
+        urgencyScore = Math.max(1, urgencyScore - 1);
+    } else if (satisfactionLevel <= 2) {
+        urgencyScore = Math.min(5, urgencyScore + 1);
+    }
+
     const urgentKeywords = [
-        'urgent', 'asap', 'immediately', 'emergency', 'critical', 
-        'broken', 'not working', 'down', 'error', 'problem', 
-        'issue', 'bug', 'help', 'stuck', 'can\'t'
+        'urgent', 'emergency', 'asap', 'immediately', 'critical',
+        'không hoạt động', 'lỗi', 'không thể', 'gấp', 'khẩn cấp'
     ];
-    
-    const urgentCount = urgentKeywords.reduce((count, keyword) => {
-        const regex = new RegExp(keyword, 'gi');
-        const matches = conversation.match(regex);
-        return count + (matches ? matches.length : 0);
-    }, 0);
-    
-    urgencyScore += Math.min(urgentCount, 3);
-    
-    return Math.min(Math.max(urgencyScore, 1), 10);
+
+    const lowUrgencyKeywords = [
+        'when you have time', 'no rush', 'whenever', 'không gấp', 'từ từ'
+    ];
+
+    const text = conversationText.toLowerCase();
+
+    const urgentMatches = urgentKeywords.filter(keyword => text.includes(keyword)).length;
+    const lowUrgencyMatches = lowUrgencyKeywords.filter(keyword => text.includes(keyword)).length;
+
+    if (urgentMatches > lowUrgencyMatches) {
+        urgencyScore = Math.min(5, urgencyScore + urgentMatches);
+    } else if (lowUrgencyMatches > urgentMatches) {
+        urgencyScore = Math.max(1, urgencyScore - lowUrgencyMatches);
+    }
+
+    return urgencyScore;
 };
 
 export const categorizeConversation = (mainTopics: string[], technicalIssues: string[]): string => {
-    const topics = mainTopics.join(' ').toLowerCase();
-    const issues = technicalIssues.join(' ').toLowerCase();
-    
-    if (issues.includes('bug') || issues.includes('error') || issues.includes('broken')) {
-        return 'technical_support';
+    if (!mainTopics || mainTopics.length === 0) return 'general';
+
+    const categories: Record<string, string[]> = {
+        'technical': ['bug', 'error', 'issue', 'problem', 'lỗi', 'vấn đề kỹ thuật'],
+        'billing': ['payment', 'invoice', 'billing', 'charge', 'thanh toán', 'hóa đơn'],
+        'feature': ['feature', 'request', 'enhancement', 'tính năng', 'yêu cầu'],
+        'support': ['help', 'assistance', 'guide', 'tutorial', 'hỗ trợ', 'hướng dẫn'],
+        'feedback': ['feedback', 'suggestion', 'improvement', 'phản hồi', 'góp ý'],
+        'account': ['account', 'profile', 'login', 'password', 'tài khoản', 'đăng nhập']
+    };
+
+    const allText = [...mainTopics, ...technicalIssues].join(' ').toLowerCase();
+
+    for (const [category, keywords] of Object.entries(categories)) {
+        if (keywords.some(keyword => allText.includes(keyword))) {
+            return category;
+        }
     }
-    
-    if (topics.includes('billing') || topics.includes('payment') || topics.includes('price')) {
-        return 'billing_support';
-    }
-    
-    if (topics.includes('account') || topics.includes('login') || topics.includes('password')) {
-        return 'account_support';
-    }
-    
-    if (topics.includes('feature') || topics.includes('request') || topics.includes('enhancement')) {
-        return 'feature_request';
-    }
-    
-    if (topics.includes('question') || topics.includes('how to') || topics.includes('guide')) {
-        return 'general_inquiry';
-    }
-    
-    return 'general_support';
+
+    return 'general';
 };

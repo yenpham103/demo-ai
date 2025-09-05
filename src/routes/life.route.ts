@@ -3,7 +3,11 @@ import { Router } from 'express';
 const router = Router();
 
 router.get('/', (req, res) => {
-  res.status(200).send('OK')
+  res.json({
+    status: 'ok',
+    timestamp: new Date().toISOString(),
+    service: 'tb-customers-ai'
+  });
 });
 
 export default router;

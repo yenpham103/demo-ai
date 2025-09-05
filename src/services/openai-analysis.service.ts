@@ -9,13 +9,15 @@ const openai = new OpenAI({
 
 export class OpenAIAnalysisService {
     static async analyzeSession(sessionId: string): Promise<void> {
+        console.log(`🤖 Starting AI analysis for session: ${sessionId}`);
+
         const session = await SessionService.getSessionBySessionId(sessionId);
         if (!session) {
             throw new Error(`Session ${sessionId} not found`);
         }
 
         if (!session.conversation_text || session.conversation_text.trim().length === 0) {
-            console.log(`No conversation text for session ${sessionId}`);
+            console.log(`⚠️ No conversation text for session ${sessionId}`);
             return;
         }
 
@@ -79,7 +81,8 @@ export class OpenAIAnalysisService {
             mentioned_products: JSON.stringify(analysisResponse.mentioned_products),
             technical_issues: JSON.stringify(analysisResponse.technical_issues),
             feature_requests: JSON.stringify(analysisResponse.feature_requests),
-            openai_response: analysisResponse
+            openai_response: analysisResponse,
+            summary_embedding: ''
         };
 
         await AnalysisService.createAnalysis(analysisData);
@@ -91,28 +94,28 @@ export class OpenAIAnalysisService {
             urgency_score: urgencyScore
         });
 
-        console.log(`Completed AI analysis for session: ${sessionId}`);
+        console.log(`✅ Completed AI analysis for session: ${sessionId}`);
     }
 
     static async batchAnalyzeUnprocessedSessions(batchSize: number = 10): Promise<void> {
         const unanalyzedSessions = await SessionService.getUnanalyzedSessions(batchSize);
 
         if (unanalyzedSessions.length === 0) {
-            console.log('No unanalyzed sessions found');
+            console.log('🎉 No unanalyzed sessions found');
             return;
         }
 
-        console.log(`Found ${unanalyzedSessions.length} unanalyzed sessions`);
+        console.log(`📊 Found ${unanalyzedSessions.length} unanalyzed sessions`);
 
         for (const session of unanalyzedSessions) {
             try {
                 await this.analyzeSession(session.session_id);
-                await new Promise(resolve => setTimeout(resolve, 1000));
+                await new Promise(resolve => setTimeout(resolve, 1000)); // Rate limit
             } catch (error) {
                 console.error(`Failed to analyze session ${session.session_id}:`, (error as Error).message);
             }
         }
 
-        console.log('Batch analysis completed');
+        console.log('✅ Batch analysis completed');
     }
 }

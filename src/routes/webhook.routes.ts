@@ -4,6 +4,7 @@ import { verifyCrispSignature } from '../middlewares/verifyCrispSignature.middle
 
 const router = Router();
 
-router.post('/crisp', verifyCrispSignature, WebhookController.handleCrispWebhook);
+router.post('/crisp', verifyCrispSignature, WebhookController.crispWebhook);
 
 export default router;
+
