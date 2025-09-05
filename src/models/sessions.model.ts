@@ -21,6 +21,9 @@ interface SessionAttributes {
   total_messages: number | null;
   first_message_at: Date | null;
   last_message_at: Date | null;
+  work_day: Date | null;
+  has_files: boolean;
+  response_time_minutes: number | null;
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -48,8 +51,13 @@ export class Session extends Model<SessionAttributes, SessionCreationAttributes>
   public total_messages!: number | null;
   public first_message_at!: Date | null;
   public last_message_at!: Date | null;
+  public work_day!: Date | null;
+  public has_files!: boolean;
+  public response_time_minutes!: number | null;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
+
+  public analysis?: any;
 
   public static initModel(sequelize: Sequelize): typeof Session {
     Session.init({
@@ -137,6 +145,19 @@ export class Session extends Model<SessionAttributes, SessionCreationAttributes>
       },
       last_message_at: {
         type: DataTypes.DATE,
+        allowNull: true
+      },
+      work_day: {
+        type: DataTypes.DATEONLY,
+        allowNull: true
+      },
+      has_files: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false
+      },
+      response_time_minutes: {
+        type: DataTypes.INTEGER,
         allowNull: true
       },
       createdAt: {

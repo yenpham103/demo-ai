@@ -89,14 +89,28 @@ module.exports = {
         type: DataTypes.DATE,
         allowNull: true,
       },
+      work_day: {
+        type: DataTypes.DATEONLY,
+        allowNull: true,
+      },
+      has_files: {
+        type: DataTypes.BOOLEAN,
+        allowNull: false,
+        defaultValue: false,
+      },
+      response_time_minutes: {
+        type: DataTypes.INTEGER,
+        allowNull: true,
+      },
       createdAt: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
       updatedAt: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
     });
 
     await queryInterface.addIndex('sessions', ['session_id']);
-    await queryInterface.addIndex('sessions', ['customer_user_id']);
+    await queryInterface.addIndex('sessions', ['work_day']);
     await queryInterface.addIndex('sessions', ['ai_analyzed']);
-    await queryInterface.addIndex('sessions', ['first_message_at', 'last_message_at']);
+    await queryInterface.addIndex('sessions', ['category']);
+    await queryInterface.addIndex('sessions', ['first_message_at']);
   },
 
   down: async (queryInterface) => {

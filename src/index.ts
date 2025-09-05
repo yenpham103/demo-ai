@@ -6,6 +6,7 @@ import compression from 'compression';
 import { connectRabbitMQ } from './config/rabbitmq.config';
 import { sequelize } from './models';
 import routes from './routes';
+import { CronService } from './services/cron.service';
 
 const app = express();
 const PORT = process.env.PORT || 3002;
@@ -46,7 +47,6 @@ app.use(cors({
 
 app.use(express.json({ limit: '1mb' }));
 app.use(express.urlencoded({ extended: true, limit: '1mb' }));
-
 app.use('/', routes);
 
 const checkEnvironmentVariables = (): boolean => {
@@ -65,7 +65,7 @@ const checkEnvironmentVariables = (): boolean => {
     const missingVars = requiredVars.filter(varName => !process.env[varName]);
 
     if (missingVars.length > 0) {
-        console.error('❌ Missing required environment variables:');
+        console.error('Missing required environment variables:');
         missingVars.forEach(varName => {
             console.error(`   - ${varName}`);
         });
@@ -81,35 +81,40 @@ const startServer = async (): Promise<void> => {
             process.exit(1);
         }
 
-        console.log('🔌 Testing database connection...');
+        console.log('Testing database connection...');
         await sequelize.authenticate();
-        console.log('✅ Database connected successfully');
+        console.log('Database connected successfully');
 
-        console.log('📊 Running database migrations...');
+        console.log('Running database migrations...');
         await sequelize.sync();
-        console.log('✅ Database migrations completed');
+        console.log('Database migrations completed');
 
-        console.log('🐰 Connecting to RabbitMQ...');
+        console.log('Connecting to RabbitMQ...');
         await connectRabbitMQ();
 
+        console.log('Starting cron jobs...');
+        CronService.startAllCronJobs();
+
         app.listen(PORT, () => {
-            console.log(`🚀 Server is running on port ${PORT}`);
+            console.log(`Server is running on port ${PORT}`);
+            console.log(`Started at: ${new Date().toISOString()}`);
+            console.log('Daily insights will run at 7:30 AM (GMT+7)');
         });
 
     } catch (error) {
-        console.error('❌ Failed to start server:', (error as Error).message);
+        console.error('Failed to start server:', (error as Error).message);
         process.exit(1);
     }
 };
 
 process.on('SIGTERM', async () => {
-    console.log('🛑 SIGTERM received, shutting down gracefully...');
+    console.log('SIGTERM received, shutting down gracefully...');
     await sequelize.close();
     process.exit(0);
 });
 
 process.on('SIGINT', async () => {
-    console.log('🛑 SIGINT received, shutting down gracefully...');
+    console.log('SIGINT received, shutting down gracefully...');
     await sequelize.close();
     process.exit(0);
 });

@@ -1,4 +1,4 @@
-import { DataTypes, Model, Optional, Sequelize, QueryTypes } from 'sequelize';
+import { DataTypes, Model, Optional, Sequelize } from 'sequelize';
 
 interface AnalysisAttributes {
   id: number;
@@ -15,7 +15,6 @@ interface AnalysisAttributes {
   technical_issues: string;
   feature_requests: string;
   openai_response: any;
-  summary_embedding: number[] | null; // Vector embedding
   createdAt?: Date;
   updatedAt?: Date;
 }
@@ -37,7 +36,6 @@ export class Analysis extends Model<AnalysisAttributes, AnalysisCreationAttribut
   public technical_issues!: string;
   public feature_requests!: string;
   public openai_response!: any;
-  public summary_embedding!: number[] | null;
   public readonly createdAt!: Date;
   public readonly updatedAt!: Date;
 
@@ -101,10 +99,6 @@ export class Analysis extends Model<AnalysisAttributes, AnalysisCreationAttribut
         type: DataTypes.JSON,
         allowNull: false
       },
-      summary_embedding: {
-        type: 'vector(1536)', // pgvector type
-        allowNull: true
-      },
       createdAt: {
         type: DataTypes.DATE,
         defaultValue: DataTypes.NOW
@@ -121,33 +115,5 @@ export class Analysis extends Model<AnalysisAttributes, AnalysisCreationAttribut
     });
 
     return Analysis;
-  }
-
-  public static async findSimilar(sessionId: string, limit: number = 5): Promise<any[]> {
-    const results = await this.sequelize!.query(`
-      WITH target_session AS (
-        SELECT summary_embedding
-        FROM analyses
-        WHERE session_id = :sessionId
-        AND summary_embedding IS NOT NULL
-      )
-      SELECT 
-        a.session_id,
-        a.conversation_summary,
-        a.customer_mood,
-        a.main_topic,
-        1 - (a.summary_embedding <=> target_session.summary_embedding) as similarity_score
-      FROM analyses a
-      CROSS JOIN target_session
-      WHERE a.session_id != :sessionId
-        AND a.summary_embedding IS NOT NULL
-      ORDER BY a.summary_embedding <=> target_session.summary_embedding
-      LIMIT :limit
-    `, {
-      replacements: { sessionId, limit },
-      type: QueryTypes.SELECT
-    });
-
-    return results;
   }
 }
