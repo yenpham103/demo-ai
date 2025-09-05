@@ -8,7 +8,9 @@
     "dev": "tsx watch src/index.ts",
     "start": "node dist/index.js",
     "analyze:batch": "tsx src/scripts/batch-analysis.ts",
-    "analyze:session": "tsx src/scripts/analyze-session.ts" 
+    "analyze:session": "tsx src/scripts/analyze-session.ts",
+    "import:sessions": "tsx src/scripts/import-sessions.ts",
+    "update:embeddings": "tsx src/scripts/update-embeddings.ts"
   },
   "repository": {
     "type": "git",

@@ -1,4 +1,4 @@
-import { CRISP_MESSAGES_QUEUE } from 'src/constants/crisp.constant';
+import { CRISP_MESSAGES_QUEUE } from '../constants/rabbitmq.constant';
 import { getRabbitChannel } from '../config/rabbitmq.config';
 
 interface ConversationData {

@@ -1,5 +1,5 @@
 import amqp from 'amqplib';
-import { initConsumeRabbitMQ } from 'src/consumers/init.consumer';
+import { initConsumeRabbitMQ } from '../consumers/init.consumer';
 
 const url = process.env.RABBITMQ_URL || 'amqp://localhost';
 

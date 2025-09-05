@@ -2,7 +2,7 @@
 
 module.exports = {
   up: async (queryInterface, DataTypes) => {
-    await queryInterface.createTable('customers', {
+    await queryInterface.createTable('customer_profiles', {
       id: {
         type: DataTypes.INTEGER.UNSIGNED,
         autoIncrement: true,
@@ -15,46 +15,59 @@ module.exports = {
       },
       primary_nickname: {
         type: DataTypes.STRING,
-        allowNull: false,
+        allowNull: true,
       },
       total_sessions: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        defaultValue: 0,
       },
       total_messages: {
         type: DataTypes.INTEGER,
         allowNull: false,
+        defaultValue: 0,
       },
       first_contact: {
-        type: DataTypes.STRING,
-        allowNull: false,
+        type: DataTypes.DATE,
+        allowNull: true,
       },
       last_contact: {
-        type: DataTypes.STRING,
-        allowNull: false,
+        type: DataTypes.DATE,
+        allowNull: true,
       },
       overall_satisfaction: {
         type: DataTypes.FLOAT,
-        allowNull: false,
+        allowNull: true,
       },
       common_issues: {
-        type: DataTypes.STRING,
+        type: DataTypes.ARRAY(DataTypes.TEXT),
         allowNull: false,
+        defaultValue: '{}',
       },
       behavior_pattern: {
         type: DataTypes.STRING,
         allowNull: false,
+        defaultValue: 'new',
       },
       profile_embedding: {
-        type: DataTypes.STRING,
-        allowNull: false,
+        type: 'vector(1536)',
+        allowNull: true,
       },
       createdAt: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
       updatedAt: { type: DataTypes.DATE, defaultValue: DataTypes.NOW },
     });
+
+    await queryInterface.addIndex('customer_profiles', ['customer_key']);
+    await queryInterface.addIndex('customer_profiles', ['behavior_pattern']);
+    
+    await queryInterface.sequelize.query(`
+      CREATE INDEX idx_customer_profile_embedding 
+      ON customer_profiles USING ivfflat (profile_embedding vector_cosine_ops) 
+      WITH (lists = 100);
+    `);
   },
 
   down: async (queryInterface) => {
-    await queryInterface.dropTable('customers');
+    await queryInterface.dropTable('customer_profiles');
   },
 };

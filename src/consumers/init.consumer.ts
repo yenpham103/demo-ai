@@ -1,6 +1,6 @@
 import amqp from 'amqplib';
-import { CRISP_MESSAGES_QUEUE } from 'src/constants/crisp.constant';
 import { handleCrispMessageConsume } from './crisp.consumer';
+import { CRISP_MESSAGES_QUEUE } from '../constants/rabbitmq.constant';
 
 export const initConsumeRabbitMQ = async (channel: amqp.Channel): Promise<void> => {
     await channel.assertQueue(CRISP_MESSAGES_QUEUE, { durable: true });

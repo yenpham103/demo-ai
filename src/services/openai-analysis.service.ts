@@ -1,11 +1,7 @@
-import OpenAI from 'openai';
 import { SessionService } from './session.service';
 import { AnalysisService } from './analysis.service';
 import { mapMoodToSentiment, calculateUrgencyScore, categorizeConversation } from '../utils/openai-analysis.utils';
-
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY
-});
+import { openai } from '../config/openai';
 
 export class OpenAIAnalysisService {
     static async analyzeSession(sessionId: string): Promise<void> {
@@ -55,11 +51,26 @@ export class OpenAIAnalysisService {
             let analysisResponse;
             try {
                 const responseText = completion.choices[0].message.content?.trim() || '';
-                analysisResponse = JSON.parse(responseText);
+                const cleanedResponse = responseText
+                    .replace(/```json\n?/g, "")
+                    .replace(/```\n?/g, "")
+                    .trim();
+                analysisResponse = JSON.parse(cleanedResponse);
             } catch (parseError) {
                 console.error('❌ Failed to parse OpenAI response as JSON:', parseError);
                 return;
             }
+
+            console.log('🔍 Generating embedding for conversation summary...');
+            const embeddingText = analysisResponse.conversation_summary || 
+                                session.conversation_text.substring(0, 1000);
+            
+            const embeddingResponse = await openai.embeddings.create({
+                model: 'text-embedding-3-small',
+                input: embeddingText
+            });
+
+            const embedding = embeddingResponse.data[0].embedding;
 
             const customerSentiment = mapMoodToSentiment(analysisResponse.customer_mood);
             const urgencyScore = calculateUrgencyScore(session.conversation_text, analysisResponse.satisfaction_level);
@@ -79,7 +90,7 @@ export class OpenAIAnalysisService {
                 technical_issues: JSON.stringify(analysisResponse.technical_issues),
                 feature_requests: JSON.stringify(analysisResponse.feature_requests),
                 openai_response: analysisResponse,
-                summary_embedding: analysisResponse.conversation_summary
+                summary_embedding: embedding
             };
 
             await AnalysisService.createAnalysis(analysisData);
@@ -95,6 +106,36 @@ export class OpenAIAnalysisService {
 
         } catch (error) {
             console.error(`❌ Error analyzing session ${sessionId}:`, (error as Error).message);
+            throw error;
+        }
+    }
+
+    static async findSimilarConversations(sessionId: string, limit: number = 5): Promise<any[]> {
+        try {
+            console.log(`🔍 Finding similar conversations for session: ${sessionId}`);
+
+            const { Analysis } = await import('../models/analysis.model');
+            const similarConversations = await Analysis.findSimilar(sessionId, limit);
+
+            console.log(`✅ Found ${similarConversations.length} similar conversations`);
+            return similarConversations;
+
+        } catch (error) {
+            console.error(`❌ Error finding similar conversations:`, (error as Error).message);
+            throw error;
+        }
+    }
+
+    static async generateEmbedding(text: string): Promise<number[]> {
+        try {
+            const embeddingResponse = await openai.embeddings.create({
+                model: 'text-embedding-3-small',
+                input: text.substring(0, 8000)
+            });
+
+            return embeddingResponse.data[0].embedding;
+        } catch (error) {
+            console.error(`❌ Error generating embedding:`, (error as Error).message);
             throw error;
         }
     }

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { processMessage } from '../utils/conversation.utils';
-import { CRISP_TOPIC } from 'src/constants/crisp.constant';
+import { CRISP_TOPIC } from '../constants/rabbitmq.constant';
 
 export class WebhookController {
     static async handleCrispWebhook(req: Request, res: Response): Promise<void> {
